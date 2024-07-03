@@ -1,10 +1,12 @@
 package com.MarcosEcommerce.MarcosEcommerce.Controllers;
 
 import com.MarcosEcommerce.MarcosEcommerce.DTOs.RequestProductDto;
+import com.MarcosEcommerce.MarcosEcommerce.DTOs.UpdateProductDto;
 import com.MarcosEcommerce.MarcosEcommerce.Exceptions.ProductNotFoundException;
 import com.MarcosEcommerce.MarcosEcommerce.Models.Product;
 import com.MarcosEcommerce.MarcosEcommerce.Repositories.ProductRepository;
 import com.MarcosEcommerce.MarcosEcommerce.Services.ProductService;
+import com.MarcosEcommerce.MarcosEcommerce.Utils.DtoUtils;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -53,5 +56,25 @@ public class ProductController {
                 productDto.getPrice(), productDto.getQuantityInStock());
         Product savedProduct = productService.save(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateProductDto> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateProductDto body
+    ) {
+        //Lança exceção se o body estiver vazio;
+        DtoUtils.isEmpty(body);
+        Optional<Product> productMatch = productService.update(id, body);
+        if (productMatch.isEmpty()) {
+            throw new ProductNotFoundException("Product not founded");
+        }
+        UpdateProductDto bodyDto = modelMapper.map(productMatch.get(), UpdateProductDto.class);
+        return ResponseEntity.status(HttpStatus.OK).body(bodyDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

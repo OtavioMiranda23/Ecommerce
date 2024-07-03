@@ -1,6 +1,7 @@
 package com.MarcosEcommerce.MarcosEcommerce.Services;
 
 import com.MarcosEcommerce.MarcosEcommerce.DTOs.RequestProductDto;
+import com.MarcosEcommerce.MarcosEcommerce.DTOs.UpdateProductDto;
 import com.MarcosEcommerce.MarcosEcommerce.Exceptions.ProductNotFoundException;
 import com.MarcosEcommerce.MarcosEcommerce.Models.Product;
 import com.MarcosEcommerce.MarcosEcommerce.Repositories.ProductRepository;
@@ -29,28 +30,28 @@ public class ProductService {
     }
 
 
-//    public Optional<Product> update(Long id, RequestProductDto productDTO) {
-//        Optional<Product> optionalProduct = productRepository.findById(id);
-//        if (optionalProduct.isPresent()) {
-//            Product productMatch = optionalProduct.get();
-//
-//            if (productDTO.name() != null) {
-//                productMatch.setName(productDTO.name());
-//            }
-//            if (productDTO.description() != null) {
-//                productMatch.setDescription(productDTO.description());
-//            }
-//            if (productDTO.price() != 0) {
-//                productMatch.setPrice(productDTO.price());
-//            }
-//            if (productDTO.quantityInStock() != 0) {
-//                productMatch.setQuantityInStock(productDTO.quantityInStock());
-//            }
-//            return Optional.of(productRepository.save(productMatch));
-//        } else {
-//            return Optional.empty();
-//        }
-//    }
+    public Optional<Product> update(Long id, UpdateProductDto productDTO) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product productMatch = optionalProduct.get();
+
+            if (productDTO.getName() != null) {
+                productMatch.setName(productDTO.getName());
+            }
+            if (productDTO.getDescription() != null) {
+                productMatch.setDescription(productDTO.getDescription());
+            }
+            if (productDTO.getPrice() != null) {
+                productMatch.setPrice(productDTO.getPrice());
+            }
+            if (productDTO.getQuantityInStock() != null) {
+                productMatch.setQuantityInStock(productDTO.getQuantityInStock());
+            }
+            return Optional.of(productRepository.save(productMatch));
+        } else {
+            return Optional.empty();
+        }
+    }
 
     public void delete(Long id) {
         if(!productRepository.existsById(id)) {

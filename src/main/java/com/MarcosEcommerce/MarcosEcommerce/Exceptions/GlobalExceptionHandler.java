@@ -44,4 +44,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
+    @ExceptionHandler(EmptyDtoException.class)
+    protected ResponseEntity<Object> handleEmptyDtoException(
+            EmptyDtoException ex,
+            WebRequest request) {
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                List.of(ex.getMessage()),
+                "Empty payload",
+                request.getDescription(false));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+    }
 }
