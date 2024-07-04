@@ -10,6 +10,10 @@ import com.MarcosEcommerce.MarcosEcommerce.Utils.DtoUtils;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +39,15 @@ public class ProductController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<RequestProductDto>> getAllProducts() {
-        List<Product> products = productService.getAll();
+    public ResponseEntity<List<RequestProductDto>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<Product> products = productService.getAll(pageable);
         List<RequestProductDto> productsDTOs = products.stream()
                 .map(product -> modelMapper.map(product, RequestProductDto.class)).toList();
         return ResponseEntity.status(HttpStatus.OK).body(productsDTOs);
