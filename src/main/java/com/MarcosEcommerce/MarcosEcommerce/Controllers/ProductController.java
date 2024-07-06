@@ -15,16 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/products")
@@ -69,18 +63,16 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateProductDto> updateProduct(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateProductDto body
-    ) {
+    public ResponseEntity<UpdateProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductDto body) {
         //Lança exceção se o body estiver vazio;
         DtoUtils.isEmpty(body);
-        Optional<Product> productMatch = productService.update(id, body);
+        Product product = modelMapper.map(body, Product.class);
+
+        Optional<Product> productMatch = productService.update(id, product);
         if (productMatch.isEmpty()) {
             throw new ProductNotFoundException("Product not founded");
         }
-        UpdateProductDto bodyDto = modelMapper.map(productMatch.get(), UpdateProductDto.class);
-        return ResponseEntity.status(HttpStatus.OK).body(bodyDto);
+        return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 
     @DeleteMapping("/{id}")
