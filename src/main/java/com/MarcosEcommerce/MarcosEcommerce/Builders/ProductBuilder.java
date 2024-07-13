@@ -35,14 +35,18 @@ public class ProductBuilder {
         }
         return this;
     }
-    public boolean isAllFieldsNullOrEmpty() {
-        return (product.getName() == null || product.getName().trim().isEmpty())
-                && (product.getDescription() == null || product.getDescription().trim().isEmpty())
-                && (product.getPrice() == null)
-                && (product.getQuantityInStock() == null);
-    }
     public Product build() {
-        return product;
+        System.out.println(">" + product.getName() + product.getName().trim().isEmpty());
+        boolean isValidProduct = (product.getName() != null && !product.getName().trim().isEmpty())
+                && (product.getDescription() != null && !product.getDescription().trim().isEmpty())
+                && (product.getPrice() != null && product.getPrice() > 0)
+                && (product.getQuantityInStock() != null && product.getQuantityInStock() >= 0);
+        if (isValidProduct) {
+            return product;
+        }
+        throw new EmptyDtoException("All fields are invalid");
+
+
     }
 
 }

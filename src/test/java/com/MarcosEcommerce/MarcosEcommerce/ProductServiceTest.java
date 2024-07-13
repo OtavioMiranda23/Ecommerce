@@ -11,15 +11,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProductServiceTest {
     @InjectMocks
     private ProductService service;
@@ -33,7 +36,8 @@ public class ProductServiceTest {
                 "Electronic Bronze Sausages",
                 "cunctatio tabesco dedecor",
                 607,
-                10);
+                10
+                );
         when(repository.save(product)).thenReturn(product);
         Product post = service.save(product);
 
@@ -119,7 +123,9 @@ public class ProductServiceTest {
                 "Electronic Bronze Sausages",
                 "cunctatio tabesco dedecor",
                 607,
-                10);
+                10,
+                LocalDateTime.now()
+);
         // Simula o comportamento do repository ao salvar o produto
         when(repository.save(existingProduct)).thenReturn(existingProduct);
 
@@ -128,6 +134,7 @@ public class ProductServiceTest {
         Optional<Product> updatedProduct = service.update(1L, existingProduct);
 
         // Verifica se o produto foi atualizado corretamente
+
         assertEquals(existingProduct, updatedProduct.get());
     }
 
@@ -140,7 +147,8 @@ public class ProductServiceTest {
                 "", // Nome vazio
                 "Product description",
                 100,
-                10
+                10,
+                LocalDateTime.now()
         );
 
         // Simula o comportamento do repository ao salvar o produto
@@ -159,10 +167,14 @@ public class ProductServiceTest {
     @DisplayName("Test updating a product with whitespace name should throw EmptyDtoException")
     public void testUpdateWithWhitespaceName() {
         Product productToUpdate = new Product(
+                1L,
+                "SKU-56470aa6-739e-4369-9cdc-270bb7878d0e",
                 "   ", // Nome com espaços em branco
                 "Product description",
                 100,
-                10
+                10,
+                LocalDateTime.now()
+
         );
 
         // Simula o comportamento do repository ao salvar o produto
@@ -178,20 +190,24 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Test updating a product with negative price should throw IllegalArgumentException")
     public void testUpdateWithNegativePrice() {
         Product productToUpdate = new Product(
+                1L,
+                "SKU-56470aa6-739e-4369-9cdc-270bb7878d0e",
                 "Product name",
                 "Product description",
                 -100,
-                10
+                10,
+                LocalDateTime.now()
+
         );
 
-        // Simula o comportamento do repository ao salvar o produto
+        // Simula o comportamento do repository ao salvar o produto atualizado
         when(repository.save(productToUpdate)).thenReturn(productToUpdate);
 
-        // Simula o serviço para atualizar o produto
+        // Simula o comportamento do repository ao encontrar o produto
         when(repository.findById(productToUpdate.getId())).thenReturn(java.util.Optional.of(productToUpdate));
+
 
         // Verifica se lançará a exceção esperada ao tentar atualizar
         assertThrows(EmptyDtoException.class, () -> {
@@ -203,10 +219,14 @@ public class ProductServiceTest {
     @DisplayName("Test updating a product with negative quantity should throw IllegalArgumentException")
     public void testUpdateWithNegativeQuantity() {
         Product productToUpdate = new Product(
+                1L,
+                "SKU-56470aa6-739e-4369-9cdc-270bb7878d0e",
                 "Product name",
                 "Product description",
                 100,
-                -10 // Quantidade negativa
+                -10,
+                LocalDateTime.now()
+
         );
 
         // Simula o comportamento do repository ao salvar o produto
@@ -216,7 +236,7 @@ public class ProductServiceTest {
         when(repository.findById(productToUpdate.getId())).thenReturn(java.util.Optional.of(productToUpdate));
 
         // Verifica se lançará a exceção esperada ao tentar atualizar
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(EmptyDtoException.class, () -> {
             service.update(1L, productToUpdate);
         });
     }

@@ -62,16 +62,7 @@ public class ProductService implements ICrudService<Product, Long> {
 
         if (optionalProduct.isPresent()) {
             Product productMatch = optionalProduct.get();
-            boolean isProductBuilderValid = new ProductBuilder(optionalProduct.get())
-                    .withName(product.getName())
-                    .withDescription(product.getDescription())
-                    .withPrice(product.getPrice())
-                    .withStock(product.getQuantityInStock())
-                    .isAllFieldsNullOrEmpty();
-            if (!isProductBuilderValid) {
-                throw new EmptyDtoException("All fields are invalid");
-            }
-            Product productBuilderValid = new ProductBuilder(optionalProduct.get())
+            Product productBuilderValid = new ProductBuilder(productMatch)
                     .withName(product.getName())
                     .withDescription(product.getDescription())
                     .withPrice(product.getPrice())
@@ -79,9 +70,8 @@ public class ProductService implements ICrudService<Product, Long> {
                     .build();
 
             return Optional.of(productRepository.save(productBuilderValid));
-        } else {
-            return Optional.empty();
         }
+        return  Optional.empty();
     }
 
     public void delete(Long id) {
